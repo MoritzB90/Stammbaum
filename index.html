@@ -284,8 +284,8 @@
                   let rect = svg.getBoundingClientRect();
                   const dx = midpoint.x - rect.left;
                   const dy = midpoint.y - rect.top;
-                  transform.x -= dx * (zoomFactor - 1);
-                  transform.y -= dy * (zoomFactor - 1);
+                  transform.x -= dx * (newScale/transform.scale - 1);
+                  transform.y -= dy * (newScale/transform.scale - 1);
 
                   transform.scale = newScale
 
