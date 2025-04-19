@@ -274,7 +274,7 @@
                 const midpoint = getMidpoint(e.touches);
                 const zoomFactor = currentDistance / initialDistance;
 
-                const newScale = transform.scale * zoomFactor;
+                const newScale = Math.min(Math.max(minScale, transform.scale * zoomFactor), maxScale);
 
                 // Zoom around the midpoint
                 // Adjust pan position to prevent jumps
