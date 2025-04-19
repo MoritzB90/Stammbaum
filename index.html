@@ -115,8 +115,8 @@
     <textarea id="textInput" oninput="updateRenderedContent()"></textarea><br>
   </div>
 
-  <div id="log"></div>
-  
+  <!--<div id="log"></div>-->
+
   <div id="renderedContent" class="mermaid-container"></div>
   <!--<div class="controls">
     <button id="resetButton">zentrieren</button>
@@ -285,7 +285,7 @@
                 transform.x -= dx * (zoomFactor - 1);
                 transform.y -= dy * (zoomFactor - 1);
 
-                transform.scale = newScale;
+                transform.scale = Math.min(Math.max(minScale, newScale), maxScale);
 
                 initialDistance = currentDistance;
 
@@ -293,8 +293,8 @@
                 //console.log("Zoom Factor:", zoom);
                 svg.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
 
-                const container = document.getElementById("log");
-                container.innerHTML = `${transform.scale}`;
+                //const container = document.getElementById("log");
+                //container.innerHTML = `${transform.scale}`;
 
                 e.preventDefault(); // prevent default pinch-zoom
               } else if (gestureMode === "pan" && e.touches.length === 1 && isPanning) {
