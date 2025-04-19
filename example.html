@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <title>Küpper Stammbaum</title>
+  <style>
+    textarea {
+      width: 100%;
+      height: 50vh;
+      margin-bottom: 1em;
+      font-family: monospace;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+    #renderedContent {
+      margin-top: 2em;
+      padding: 1em;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+    }
+    #inputContainer {
+      display: block;
+    }
+  </style>
+
+<style>
+  html {
+      min-height: 100vh;
+      background: #f0f0f0;
+      /*background: repeating-linear-gradient(
+      135deg,
+      #bccad680 0px,
+      #bccad680 50px,
+      #66729280 50px,
+      #66729280 60px,
+      #f1e3dd80 60px,
+      #f1e3dd80 70px
+  );*/
+  }
+
+  /*body {
+  /*    background-color: #f8f8f8;
+  /*    color: rgb(0, 0, 0);
+  /*    min-height: 100vh;
+  /*    max-width: 100%;
+  /*    margin: 0 auto;
+  /*    line-height: 1.5;
+  /*    padding-left: 20%;
+  /*    padding-right: 20%;
+  /*    padding-top: 5%;
+  /*    padding-bottom: 5%;
+  /*}
+</style>
+
+<style>
+  /* Ensure the Mermaid container allows scrolling */
+  .mermaid-container {
+      width: auto;
+      height: 90vh; /* Adjust height as needed */
+      overflow: hidden; /* Prevents scrollbars interfering */
+      border: 1px solid #ccc; /* Optional: just for visualization */
+      position: relative; /* Required for absolute positioning */
+      background-color: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  /* Keep the SVG centered */
+  .mermaid-container svg {
+      transform-origin: 0 0; /* Important: ensures zoom is relative to top-left */
+      cursor: grab;
+  }
+
+  /* Change cursor on dragging */
+  .mermaid-container svg:active {
+      cursor: grabbing;
+  }
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.8/sjcl.min.js"></script>
+  <!--<script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    window.mermaid = mermaid;
+    mermaid.initialize({ startOnLoad: false });
+  </script>-->
+
+  <script>
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    const meta = document.createElement('meta');
+    meta.name = "viewport";
+
+    if (isMobile) {
+      meta.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes";
+    } else {
+      // On desktop, the meta tag won’t do much, but you can still add it
+      meta.content = "width=device-width, initial-scale=1";
+    }
+
+    document.head.appendChild(meta);
+  </script>
+
+</head>
+<body>
+  
+  <!-- Toggle Button -->
+  <!-- <button id="toggleButton" onclick="toggleInput()">Show Input</button><button onclick="saveHTML()">Save</button>-->
+  
+  <!-- Textarea and Save Button Container -->
+  <div id="inputContainer" style="display: none;">
+    <textarea id="textInput" oninput="updateRenderedContent()"></textarea><br>
+  </div>
+
+  <div id="log"></div>
+
+  <div id="renderedContent" class="mermaid-container"></div>
+  <!--<div class="controls">
+    <button id="resetButton">zentrieren</button>
+  </div>-->
+
+  <!-- Encrypted JSON will be embedded here -->
+  <script id="embeddedData" type="application/json">"{\"iv\":\"AhmALgX/CfHMz722ZPSemA==\",\"v\":1,\"iter\":10000,\"ks\":128,\"ts\":64,\"mode\":\"ccm\",\"adata\":\"\",\"cipher\":\"aes\",\"salt\":\"l/9e00wauuM=\",\"ct\":\"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\"}"</script>
+
+  <script>
+    async function updateRenderedContent() {
+      const input = document.getElementById("textInput").value;
+      const container = document.getElementById("renderedContent");
+
+      // Replace Mermaid blocks with placeholders
+      let renderedHTML = input;
+
+      container.innerHTML = renderedHTML;
+
+      // Render each Mermaid diagram
+      if (window.mermaid) {
+        await mermaid.run({ nodes: [...container.querySelectorAll(".mermaid")] });
+      }
+    }
+
+    window.onload = async function () {
+      // ✅ Clear rendered content before anything else
+      //const container = document.getElementById("renderedContent");
+      //if (container) container.innerHTML = "";
+
+      const raw = document.getElementById("embeddedData").textContent.trim();
+      if (!raw || raw === '"encrypted-placeholder"') return;
+
+      const password = prompt("Passwort eingeben:");
+      if (!password) return;
+
+      try {
+        const decrypted = sjcl.decrypt(password, JSON.parse(raw));
+        const data = JSON.parse(decrypted);
+        const content = data.content || "";
+        document.getElementById("textInput").value = content;
+        await updateRenderedContent();
+      } catch (e) {
+        console.error("Decryption failed:", e);
+        alert("Incorrect password or corrupted data.");
+      }
+
+      console.log("DOMContentLoaded event fired");
+        window.mermaid.run().then(() => {
+            console.log("mermaid run");
+            const svg = document.querySelector(".mermaid-container svg"); // Get the rendered SVG
+            const container = document.querySelector(".mermaid-container"); // Get the container
+            if (!svg || !container) return; // Safety check
+
+            console.log(svg);
+            
+            svg.style.transform = `translate(-600px, -200px) scale(5)`; // Initial transform to center and zoom
+
+            const svgWidth = svg.viewBox.baseVal.width;
+
+            let viewBox = { x: 0, y: -200, width: svgWidth, height: svgWidth };
+            let isPanning = false;
+            let startPoint = { x: 0, y: 0 };
+            let startViewBox = { ...viewBox };
+            let initialDistance = 0;
+            let initialScaleBox = { ...viewBox };
+
+            const panLimits = {
+              minX: 0,
+              maxX: svgWidth,
+              minY: -500,
+              maxY: 3000
+            };
+
+            const zoomLimits = {
+              min: 0.99999,
+              max: 20
+            };
+
+            svg.addEventListener("mousedown", (e) => {
+              isPanning = true;
+              startPoint = { x: e.clientX, y: e.clientY };
+              startViewBox = { ...viewBox };
+            });
+
+            svg.addEventListener("mousemove", (e) => {
+              if (!isPanning) return;
+              const dx = (e.clientX - startPoint.x)/5 * viewBox.width / svg.clientWidth;
+              const dy = (e.clientY - startPoint.y)/5 * viewBox.height / svg.clientHeight;
+              viewBox.x = clamp(startViewBox.x - dx, panLimits.minX, panLimits.maxX - viewBox.width);
+              viewBox.y = clamp(startViewBox.y - dy, panLimits.minY, panLimits.maxY - viewBox.height);
+              updateViewBox();
+            });
+
+            svg.addEventListener("mouseup", () => isPanning = false);
+            svg.addEventListener("mouseleave", () => isPanning = false);
+
+            svg.addEventListener("wheel", (e) => {
+              e.preventDefault();
+              zoom(e.clientX, e.clientY, e.deltaY > 0 ? 1.1 : 1 / 1.1);
+            });
+
+            // Touch Events
+            svg.addEventListener("touchstart", (e) => {
+              if (e.touches.length === 1) {
+                // One finger -> Pan
+                isPanning = true;
+                const touch = e.touches[0];
+                startPoint = { x: touch.clientX, y: touch.clientY };
+                startViewBox = { ...viewBox };
+              } else if (e.touches.length === 2) {
+                // Two fingers -> Pinch zoom
+                isPanning = false;
+                initialDistance = getTouchDistance(e.touches);
+                initialScaleBox = { ...viewBox };
+              }
+            }, { passive: false });
+
+            svg.addEventListener("touchmove", (e) => {
+              e.preventDefault();
+              if (e.touches.length === 1 && isPanning) {
+                const touch = e.touches[0];
+                const dx = (touch.clientX - startPoint.x) * viewBox.width / svg.clientWidth;
+                const dy = (touch.clientY - startPoint.y) * viewBox.height / svg.clientHeight;
+                viewBox.x = clamp(startViewBox.x - dx, panLimits.minX, panLimits.maxX - viewBox.width);
+                viewBox.y = clamp(startViewBox.y - dy, panLimits.minY, panLimits.maxY - viewBox.height);
+                updateViewBox();
+              } else if (e.touches.length === 2) {
+                const newDistance = getTouchDistance(e.touches);
+                const zoomFactor = initialDistance / newDistance;
+                const mid = getTouchMidpoint(e.touches);
+
+                zoom(mid.x, mid.y, zoomFactor, true);
+              }
+            }, { passive: false });
+
+            svg.addEventListener("touchend", () => isPanning = false);
+
+            function zoom(screenX, screenY, factor, isPinch = false) {
+              const rect = svg.getBoundingClientRect();
+              const zoomX = (screenX - rect.left) / rect.width * viewBox.width + viewBox.x;
+              const zoomY = (screenY - rect.top) / rect.height * viewBox.height + viewBox.y;
+
+              const newWidth = viewBox.width * factor;
+              const newHeight = viewBox.height * factor;
+              const scale = svgWidth / newWidth;
+
+              
+              const container = document.getElementById("log");
+              container.innerHTML = `${scale}`;
+
+              if (scale >= zoomLimits.min && scale <= zoomLimits.max) {
+                viewBox.x = zoomX - (zoomX - viewBox.x) * factor;
+                viewBox.y = zoomY - (zoomY - viewBox.y) * factor;
+                viewBox.width = newWidth;
+                viewBox.height = newHeight;
+
+                viewBox.x = clamp(viewBox.x, panLimits.minX, panLimits.maxX - viewBox.width);
+                viewBox.y = clamp(viewBox.y, panLimits.minY, panLimits.maxY - viewBox.height);
+
+                updateViewBox();
+              }
+            }
+
+            function getTouchDistance(touches) {
+              const dx = touches[0].clientX - touches[1].clientX;
+              const dy = touches[0].clientY - touches[1].clientY;
+              return Math.sqrt(dx * dx + dy * dy);
+            }
+
+            function getTouchMidpoint(touches) {
+              return {
+                x: (touches[0].clientX + touches[1].clientX) / 2,
+                y: (touches[0].clientY + touches[1].clientY) / 2
+              };
+            }
+
+            function updateViewBox() {
+              svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+            }
+
+            function clamp(val, min, max) {
+              return Math.max(min, Math.min(max, val));
+            }
+
+
+            });
+            
+      document.addEventListener("DOMContentLoaded", function () {
+      // Reset button functionality: Centers and resets zoom
+      resetButton.addEventListener("click", function () {
+          // Reset zoom to default
+          scale = 1.0;
+
+          // Reset pan position to center
+          dx = 0;
+          dy = 0;
+
+          // Apply the reset state (center and default zoom)
+          svg.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+        });
+    });
+
+    };
+
+    function saveHTML() {
+      const password = prompt("Passwort eingeben:");
+      if (!password) return;
+
+      const container = document.getElementById("renderedContent");
+      if (container) container.innerHTML = "";
+
+      const text = document.getElementById("textInput").value;
+      const jsonData = JSON.stringify({ content: text });
+      const encrypted = sjcl.encrypt(password, jsonData);
+
+      const scriptTag = document.getElementById("embeddedData");
+      scriptTag.textContent = JSON.stringify(encrypted);
+
+      const fullHTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML//.replace(
+      //'<div id="renderedContent">.*?</div>',
+      //'<div id="renderedContent"></div>');
+
+
+      const blob = new Blob([fullHTML], { type: "text/html" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "encrypted_mermaid.html";
+      a.click();
+    }
+
+    function toggleInput() {
+      const inputContainer = document.getElementById("inputContainer");
+      const toggleButton = document.getElementById("toggleButton");
+
+      if (inputContainer.style.display === "none") {
+        inputContainer.style.display = "block";
+        toggleButton.textContent = "Hide Input";
+      } else {
+        inputContainer.style.display = "none";
+        toggleButton.textContent = "Show Input";
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, securityLevel: 'strict' });
+
+    window.mermaid = mermaid;
+    
+    //https://icones.js.org/collection/mdi
+    mermaid.registerIconPacks([
+    {
+        name: 'mdi',
+        loader: () =>
+        fetch('https://unpkg.com/@iconify-json/mdi/icons.json').then((res) => res.json()),
+    },
+    ]);
+
+  </script>
+
+
+<!--<div class="mermaidTooltip" style="opacity: 0;"></div>-->
+
+</body>
+</html>
