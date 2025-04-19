@@ -272,9 +272,11 @@
               if (gestureMode === "pinch" && e.touches.length === 2 && initialDistance !== null) {
                 const currentDistance = getDistance(e.touches);
                 const midpoint = getMidpoint(e.touches);
-                const zoomFactor = currentDistance / initialDistance;
+                //const zoomFactor = currentDistance / initialDistance;
 
-                const newScale = Math.min(Math.max(minScale, transform.scale * zoomFactor), maxScale);
+                const zoomFactor = Math.min(Math.max(minScale, currentDistance / initialDistance), maxScale);
+
+                const newScale = transform.scale * zoomFactor;
 
                 // Zoom around the midpoint
                 // Adjust pan position to prevent jumps
