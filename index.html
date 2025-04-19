@@ -278,16 +278,17 @@
 
                 const newScale = transform.scale * zoomFactor;
 
+                transform.scale = Math.min(Math.max(minScale, newScale), maxScale);
+
                 // Zoom around the midpoint
                 // Adjust pan position to prevent jumps
-                let rect = svg.getBoundingClientRect();
-                const dx = midpoint.x - rect.left;
-                const dy = midpoint.y - rect.top;
-
-                transform.x -= dx * (zoomFactor - 1) * (transform.scale - prevScale) / transform.scale;
-                transform.y -= dy * (zoomFactor - 1) * (transform.scale - prevScale) / transform.scale;
-
-                transform.scale = Math.min(Math.max(minScale, newScale), maxScale);
+                if ((transform.scale - prevScale) !== 0) {
+                  let rect = svg.getBoundingClientRect();
+                  const dx = midpoint.x - rect.left;
+                  const dy = midpoint.y - rect.top;
+                  transform.x -= dx * (zoomFactor - 1);
+                  transform.y -= dy * (zoomFactor - 1);
+                }
 
                 initialDistance = currentDistance;
 
