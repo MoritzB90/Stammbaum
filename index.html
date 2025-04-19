@@ -286,15 +286,15 @@
                   const dy = midpoint.y - rect.top;
                   transform.x -= dx * (zoomFactor - 1);
                   transform.y -= dy * (zoomFactor - 1);
+
+                  transform.scale = newScale
+
+                  // Call your zoom logic here with zoomFactor
+                  //console.log("Zoom Factor:", zoom);
+                  svg.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
                 }
 
-                transform.scale = newScale
-
                 initialDistance = currentDistance;
-
-                // Call your zoom logic here with zoomFactor
-                //console.log("Zoom Factor:", zoom);
-                svg.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
 
                 const container = document.getElementById("log");
                 container.innerHTML = `${transform.scale}`;
